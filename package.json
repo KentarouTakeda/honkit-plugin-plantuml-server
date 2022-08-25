@@ -19,6 +19,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "fix": "run-s fix:eslint fix:prettier",
+    "fix:eslint": "eslint --fix 'src/**/*.ts' '__tests__/**/*.ts'",
+    "fix:prettier": "prettier --write 'src/**/*.ts' '__tests__/**/*.ts'",
     "prepare": "husky install 2>/dev/null || true",
     "test": "jest"
   },
