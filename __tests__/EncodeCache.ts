@@ -1,7 +1,6 @@
 import { createHash } from 'crypto';
 import { encode } from 'plantuml-encoder';
 import { EncodeCache } from '../src/EncodeCache';
-jest.mock('fs/promises');
 
 describe('EncodeCache', () => {
   const svg = Buffer.from(
