@@ -4,8 +4,9 @@ import { EncodeCache } from '../src/EncodeCache';
 jest.mock('fs/promises');
 
 describe('EncodeCache', () => {
-  const svg =
-    '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg>DUMMY DATA</svg>';
+  const svg = Buffer.from(
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg>DUMMY DATA</svg>',
+  );
   let request: jest.SpyInstance<ReturnType<EncodeCache['request']>> | null;
   let writeFile: jest.SpyInstance<ReturnType<EncodeCache['writeFile']>> | null;
   let readFile: jest.SpyInstance<ReturnType<EncodeCache['readFile']>> | null;
@@ -19,7 +20,7 @@ describe('EncodeCache', () => {
       .mockReturnValue(Promise.resolve(svg));
     writeFile = jest
       .spyOn(EncodeCache.prototype, 'writeFile')
-      .mockReturnValue(Promise.resolve());
+      .mockReturnValue(Promise.resolve(undefined));
     readFile = jest
       .spyOn(EncodeCache.prototype, 'readFile')
       .mockReturnValue(Promise.resolve(null));
@@ -124,7 +125,7 @@ describe('EncodeCache', () => {
 
   describe('readFile', () => {
     it('TODO', async () => {
-      readFile!.mockReturnValue(Promise.resolve('foo'));
+      readFile!.mockReturnValue(Promise.resolve(Buffer.from('foo')));
       const encodeCache = new EncodeCache({
         server: 'http://test.invalid',
         format: 'svg',

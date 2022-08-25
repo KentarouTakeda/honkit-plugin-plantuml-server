@@ -31,7 +31,7 @@ describe('maktHtml', () => {
   it('Svg data will be converted to figure and img tags', () => {
     const expected =
       '<figure><img src="data:image/svg+xml;base64,U1ZHIERBVEE="></figure>';
-    const actual = maktHtml('SVG DATA', 'image/svg+xml');
+    const actual = maktHtml(Buffer.from('SVG DATA'), 'image/svg+xml');
 
     expect(actual).toBe(expected);
   });
