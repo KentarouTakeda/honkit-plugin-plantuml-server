@@ -14,6 +14,7 @@ export interface config {
   readonly server: string;
   readonly format: keyof typeof mimes;
   readonly cacheDir: string | null;
+  readonly cssClass: string | null;
 }
 
 export interface EncodeCache extends EventEmitter {
@@ -35,6 +36,7 @@ export class EncodeCache extends EventEmitter {
       server: config.server.replace(/\/$/, ''),
       format: config.format,
       cacheDir: config.cacheDir ? config.cacheDir.replace(/\/$/, '') : null,
+      cssClass: config.cssClass,
     };
   }
 
@@ -122,6 +124,10 @@ export class EncodeCache extends EventEmitter {
 
   mime(): string {
     return mimes[this.#config.format];
+  }
+
+  cssClass(): config['cssClass'] {
+    return this.#config.cssClass;
   }
 
   #url(encoded: string): string {
