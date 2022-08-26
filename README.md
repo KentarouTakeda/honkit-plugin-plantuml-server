@@ -1,7 +1,7 @@
 # HonKit PlantUML Plugin
 
 [![npm version](https://badge.fury.io/js/honkit-plugin-plantuml-server.svg)](https://badge.fury.io/js/honkit-plugin-plantuml-server)
-![example branch parameter](https://github.com/KentarouTakeda/honkit-plugin-plantuml-server/actions/workflows/test.yml/badge.svg?branch=master)
+![test](https://github.com/KentarouTakeda/honkit-plugin-plantuml-server/actions/workflows/test.yml/badge.svg?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 PlantUML plugin for HonKit. **No Java or Graphviz required** .
