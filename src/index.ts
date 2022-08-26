@@ -6,6 +6,7 @@ const defaultConfig: config = {
   server: 'http://www.plantuml.com/plantuml/',
   format: 'svg',
   cacheDir: tmpdir(),
+  cssClass: 'plantuml',
 };
 
 let encodeCache: EncodeCache;
@@ -53,7 +54,7 @@ export const hooks = {
 export const blocks = {
   uml: async (block: { body: string }) => {
     const converted = await encodeCache.generate(block.body);
-    const tag = makeHtml(converted, encodeCache.mime());
+    const tag = makeHtml(converted, encodeCache.mime(), encodeCache.cssClass());
     return tag;
   },
 };

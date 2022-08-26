@@ -30,8 +30,8 @@ describe('replaceCodeBlock', () => {
 describe('makeHtml', () => {
   it('Svg data will be converted to figure and img tags', () => {
     const expected =
-      '<figure><img src="data:image/svg+xml;base64,U1ZHIERBVEE="></figure>';
-    const actual = makeHtml(Buffer.from('SVG DATA'), 'image/svg+xml');
+      '<figure class="foo"><img src="data:image/svg+xml;base64,U1ZHIERBVEE="></figure>';
+    const actual = makeHtml(Buffer.from('SVG DATA'), 'image/svg+xml', 'foo');
 
     expect(actual).toBe(expected);
   });
