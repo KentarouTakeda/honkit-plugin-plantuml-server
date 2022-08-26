@@ -57,6 +57,7 @@ You can also use `uml` / `puml` as the language specification.
 |server|*http://www.plantuml.com/plantuml/* |URL for rendering on your own server|
 |format|*svg*|Supports *png* and *svg*|
 |cacheDir|`os.tmpdir()`|Directory to cache rendered results. If `null` is specified, cache is not used.|
+|cssClass|plantuml|CSS class name given to the rendered figure.|
 
 A `book.json` describing these would look like this, for example:
 
