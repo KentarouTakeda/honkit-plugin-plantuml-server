@@ -78,7 +78,8 @@ A `book.json` describing these would look like this, for example:
     "plantuml-server": {
       "server": "http://your-server.local/plantuml/",
       "format": "png",
-      "cacheDir": "/tmp"
+      "cacheDir": "/tmp",
+      "cssClass": "customClassName"
     }
   }
 }
