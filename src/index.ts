@@ -16,6 +16,8 @@ export const hooks = {
     const config = Object.assign(
       defaultConfig,
       this.config.get('pluginsConfig.plantuml-server'),
+      // ebook-convert cannot handle svg format data-uri, so it is forced to change to png
+      this.output.name === 'ebook' ? { format: 'png' } : {},
     );
 
     if (true !== Object.keys(mimes).includes(config.format)) {
