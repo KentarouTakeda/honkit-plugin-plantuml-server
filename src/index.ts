@@ -1,6 +1,6 @@
 import { tmpdir } from 'os';
 import { EncodeCache, config, mimes } from './EncodeCache';
-import { maktHtml, replaceCodeBlock } from './libs';
+import { makeHtml, replaceCodeBlock } from './libs';
 
 const defaultConfig: config = {
   server: 'http://www.plantuml.com/plantuml/',
@@ -53,7 +53,7 @@ export const hooks = {
 export const blocks = {
   uml: async (block: { body: string }) => {
     const converted = await encodeCache.generate(block.body);
-    const tag = maktHtml(converted, encodeCache.mime());
+    const tag = makeHtml(converted, encodeCache.mime());
     return tag;
   },
 };

@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import { maktHtml, replaceCodeBlock } from '../src/libs';
+import { makeHtml, replaceCodeBlock } from '../src/libs';
 
 describe('replaceCodeBlock', () => {
   it('If plain text is input, return it as is', async () => {
@@ -27,11 +27,11 @@ describe('replaceCodeBlock', () => {
   });
 });
 
-describe('maktHtml', () => {
+describe('makeHtml', () => {
   it('Svg data will be converted to figure and img tags', () => {
     const expected =
       '<figure><img src="data:image/svg+xml;base64,U1ZHIERBVEE="></figure>';
-    const actual = maktHtml(Buffer.from('SVG DATA'), 'image/svg+xml');
+    const actual = makeHtml(Buffer.from('SVG DATA'), 'image/svg+xml');
 
     expect(actual).toBe(expected);
   });
