@@ -24,22 +24,22 @@ export const hooks = {
 
     plantUMLServer = new PlantUMLServer(config);
     plantUMLServer.on('process:start', (hash) =>
-      this.log.info(`plantuml-server: converting: ${hash}`),
+      this.log.info(`plantuml-server: converting: ${hash}\n`),
     );
     plantUMLServer.on('process:memory', (hash) =>
-      this.log.info(`plantuml-server: converted from memoty: ${hash}`),
+      this.log.info(`plantuml-server: converted from memoty: ${hash}\n`),
     );
     plantUMLServer.on('process:cache', (hash) =>
-      this.log.info(`plantuml-server: converted from cache: ${hash}`),
+      this.log.info(`plantuml-server: converted from cache: ${hash}\n`),
     );
     plantUMLServer.on('process:server', (hash) =>
-      this.log.info(`plantuml-server: converted from server: ${hash}`),
+      this.log.info(`plantuml-server: converted from server: ${hash}\n`),
     );
     plantUMLServer.on('cache:write', (fileName) =>
-      this.log.info(`plantuml-server: write cache: ${fileName}`),
+      this.log.info(`plantuml-server: write cache: ${fileName}\n`),
     );
     plantUMLServer.on('cache:error', (fileName) =>
-      this.log.warn(`plantuml-server: unnable to write cache: ${fileName}`),
+      this.log.warn(`plantuml-server: unnable to write cache: ${fileName}\n`),
     );
   },
 
