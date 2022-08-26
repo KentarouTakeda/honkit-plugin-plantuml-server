@@ -37,6 +37,7 @@ describe('EncodeCache', () => {
         server: 'foo',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const actual = await encodeCache.generate('Bob -> Alice : Hello!');
       expect(actual).toBe(svg);
@@ -47,6 +48,7 @@ describe('EncodeCache', () => {
         server: 'foo',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const once = await encodeCache.generate('Bob -> Alice : Hello!');
       const twice = await encodeCache.generate('Bob -> Alice : Hello!');
@@ -61,6 +63,7 @@ describe('EncodeCache', () => {
         server: 'foo',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const twice = await encodeCache.generate('Bob -> Alice : Hello!');
       const once = await encodeCache.generate('Alice ->  Bob: Hi!');
@@ -77,6 +80,7 @@ describe('EncodeCache', () => {
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const uml = 'Bob -> Alice : Hello!';
       const encoded = encode(uml);
@@ -92,6 +96,7 @@ describe('EncodeCache', () => {
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: '/path/to/cache',
+        cssClass: 'bar',
       });
       const uml = 'Bob -> Alice : Hello!';
       const hash = createHash('sha1').update(uml).digest('hex');
@@ -111,6 +116,7 @@ describe('EncodeCache', () => {
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const uml = 'Bob -> Alice : Hello!';
       const hash = createHash('sha1').update(uml).digest('hex');
@@ -129,6 +135,7 @@ describe('EncodeCache', () => {
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
+        cssClass: 'bar',
       });
       const uml = 'Bob -> Alice : Hello!';
       await encodeCache.generate(uml);
