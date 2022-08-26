@@ -34,7 +34,7 @@ In this case your diagram is rendered on a public server. If you care about priv
 
 Write a code block quote specified to the `plantuml` language in markdown.
 
-For example, if you write the following in README.md:
+For example, if you write the following in README.md.
 
 <pre>
 # Introduction
@@ -43,12 +43,20 @@ For example, if you write the following in README.md:
 Bob->Alice : Hello!
 ```
 </pre>
+*NOTE: You can also use `uml` / `puml` as the language specification.*
 
 Then it will be displayed like this.
 
 ![](images/example.png)
 
-You can also use `uml` / `puml` as the language specification.
+HTML is authored for example as follows.
+
+```html
+<figure class="plantuml">
+  <img src="data:image/svg+xml;base64,........">
+</figure>
+```
+*NOTE: You can change the CSS class name as you like.*
 
 ## Configuration
 
