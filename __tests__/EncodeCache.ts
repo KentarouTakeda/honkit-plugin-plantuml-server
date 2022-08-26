@@ -1,30 +1,32 @@
 import { createHash } from 'crypto';
 import { encode } from 'plantuml-encoder';
-import { EncodeCache } from '../src/EncodeCache';
+import { PlantUMLServer } from '../src/PlantUMLServer';
 
-describe('EncodeCache', () => {
+describe('PlantUMLServer', () => {
   const svg = Buffer.from(
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg>DUMMY DATA</svg>',
   );
-  let request: jest.SpyInstance<ReturnType<EncodeCache['request']>> | null;
-  let writeFile: jest.SpyInstance<ReturnType<EncodeCache['writeFile']>> | null;
-  let readFile: jest.SpyInstance<ReturnType<EncodeCache['readFile']>> | null;
+  let request: jest.SpyInstance<ReturnType<PlantUMLServer['request']>> | null;
+  let writeFile: jest.SpyInstance<
+    ReturnType<PlantUMLServer['writeFile']>
+  > | null;
+  let readFile: jest.SpyInstance<ReturnType<PlantUMLServer['readFile']>> | null;
   let makeCacheDirectory: jest.SpyInstance<
-    ReturnType<EncodeCache['makeCacheDirectory']>
+    ReturnType<PlantUMLServer['makeCacheDirectory']>
   > | null;
 
   beforeEach(() => {
     request = jest
-      .spyOn(EncodeCache.prototype, 'request')
+      .spyOn(PlantUMLServer.prototype, 'request')
       .mockReturnValue(Promise.resolve(svg));
     writeFile = jest
-      .spyOn(EncodeCache.prototype, 'writeFile')
+      .spyOn(PlantUMLServer.prototype, 'writeFile')
       .mockReturnValue(Promise.resolve(undefined));
     readFile = jest
-      .spyOn(EncodeCache.prototype, 'readFile')
+      .spyOn(PlantUMLServer.prototype, 'readFile')
       .mockReturnValue(Promise.resolve(null));
     makeCacheDirectory = jest
-      .spyOn(EncodeCache.prototype, 'makeCacheDirectory')
+      .spyOn(PlantUMLServer.prototype, 'makeCacheDirectory')
       .mockReturnValue(Promise.resolve());
   });
   afterEach(() => {
@@ -33,25 +35,25 @@ describe('EncodeCache', () => {
 
   describe('generate()', () => {
     it('Request the entered uml to the server and return the response as is.', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'foo',
         format: 'svg',
         cacheDir: null,
         cssClass: 'bar',
       });
-      const actual = await encodeCache.generate('Bob -> Alice : Hello!');
+      const actual = await plantUMLServer.generate('Bob -> Alice : Hello!');
       expect(actual).toBe(svg);
     });
 
     it('Request only once if same uml is entered multiple times', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'foo',
         format: 'svg',
         cacheDir: null,
         cssClass: 'bar',
       });
-      const once = await encodeCache.generate('Bob -> Alice : Hello!');
-      const twice = await encodeCache.generate('Bob -> Alice : Hello!');
+      const once = await plantUMLServer.generate('Bob -> Alice : Hello!');
+      const twice = await plantUMLServer.generate('Bob -> Alice : Hello!');
 
       expect(once).toBe(svg);
       expect(twice).toBe(svg);
@@ -59,14 +61,14 @@ describe('EncodeCache', () => {
     });
 
     it('If different UML is entered, request that number of times.', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'foo',
         format: 'svg',
         cacheDir: null,
         cssClass: 'bar',
       });
-      const twice = await encodeCache.generate('Bob -> Alice : Hello!');
-      const once = await encodeCache.generate('Alice ->  Bob: Hi!');
+      const twice = await plantUMLServer.generate('Bob -> Alice : Hello!');
+      const once = await plantUMLServer.generate('Alice ->  Bob: Hi!');
 
       expect(once).toBe(svg);
       expect(twice).toBe(svg);
@@ -76,7 +78,7 @@ describe('EncodeCache', () => {
 
   describe('request()', () => {
     it('The destination URL will be determined according to the config value.', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
@@ -85,14 +87,14 @@ describe('EncodeCache', () => {
       const uml = 'Bob -> Alice : Hello!';
       const encoded = encode(uml);
 
-      await encodeCache.generate(uml);
+      await plantUMLServer.generate(uml);
       expect(request).toBeCalledWith('http://test.invalid/svg/' + encoded);
     });
   });
 
   describe('writeCache', () => {
     it('Conversion results are cached in the file system using the hash of the uml document as a key', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: '/path/to/cache',
@@ -101,8 +103,8 @@ describe('EncodeCache', () => {
       const uml = 'Bob -> Alice : Hello!';
       const hash = createHash('sha1').update(uml).digest('hex');
 
-      await encodeCache.generate(uml);
-      await encodeCache.writeCache();
+      await plantUMLServer.generate(uml);
+      await plantUMLServer.writeCache();
       expect(writeFile).toBeCalledWith(
         '/path/to/cache/honkit-plugin-plantuml-server-' + hash + '.svg',
         svg,
@@ -112,7 +114,7 @@ describe('EncodeCache', () => {
     });
 
     it('If `cacheDir` is not set, conversion results will not be cached.', async () => {
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
@@ -121,8 +123,8 @@ describe('EncodeCache', () => {
       const uml = 'Bob -> Alice : Hello!';
       const hash = createHash('sha1').update(uml).digest('hex');
 
-      await encodeCache.generate(uml);
-      await encodeCache.writeCache();
+      await plantUMLServer.generate(uml);
+      await plantUMLServer.writeCache();
       expect(writeFile).not.toBeCalled();
       expect(makeCacheDirectory).not.toBeCalled();
     });
@@ -131,14 +133,14 @@ describe('EncodeCache', () => {
   describe('readFile', () => {
     it('TODO', async () => {
       readFile!.mockReturnValue(Promise.resolve(Buffer.from('foo')));
-      const encodeCache = new EncodeCache({
+      const plantUMLServer = new PlantUMLServer({
         server: 'http://test.invalid',
         format: 'svg',
         cacheDir: null,
         cssClass: 'bar',
       });
       const uml = 'Bob -> Alice : Hello!';
-      await encodeCache.generate(uml);
+      await plantUMLServer.generate(uml);
 
       expect(request).not.toHaveBeenCalled();
     });

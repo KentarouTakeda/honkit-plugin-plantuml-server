@@ -1,5 +1,5 @@
 import { tmpdir } from 'os';
-import { EncodeCache, config, mimes } from './EncodeCache';
+import { PlantUMLServer, config, mimes } from './PlantUMLServer';
 import { makeHtml, replaceCodeBlock } from './libs';
 
 const defaultConfig: config = {
@@ -9,7 +9,7 @@ const defaultConfig: config = {
   cssClass: 'plantuml',
 };
 
-let encodeCache: EncodeCache;
+let plantUMLServer: PlantUMLServer;
 
 export const hooks = {
   init: function (this: any) {
@@ -22,23 +22,23 @@ export const hooks = {
       throw new Error(`plantuml-server: invalid format "${config.format}"`);
     }
 
-    encodeCache = new EncodeCache(config);
-    encodeCache.on('process:start', (hash) =>
+    plantUMLServer = new PlantUMLServer(config);
+    plantUMLServer.on('process:start', (hash) =>
       this.log.info(`plantuml-server: converting: ${hash}`),
     );
-    encodeCache.on('process:memory', (hash) =>
+    plantUMLServer.on('process:memory', (hash) =>
       this.log.info(`plantuml-server: converted from memoty: ${hash}`),
     );
-    encodeCache.on('process:cache', (hash) =>
+    plantUMLServer.on('process:cache', (hash) =>
       this.log.info(`plantuml-server: converted from cache: ${hash}`),
     );
-    encodeCache.on('process:server', (hash) =>
+    plantUMLServer.on('process:server', (hash) =>
       this.log.info(`plantuml-server: converted from server: ${hash}`),
     );
-    encodeCache.on('cache:write', (fileName) =>
+    plantUMLServer.on('cache:write', (fileName) =>
       this.log.info(`plantuml-server: write cache: ${fileName}`),
     );
-    encodeCache.on('cache:error', (fileName) =>
+    plantUMLServer.on('cache:error', (fileName) =>
       this.log.warn(`plantuml-server: unnable to write cache: ${fileName}`),
     );
   },
@@ -48,13 +48,17 @@ export const hooks = {
     return page;
   },
 
-  'finish:before': () => encodeCache.writeCache(),
+  'finish:before': () => plantUMLServer.writeCache(),
 };
 
 export const blocks = {
   uml: async (block: { body: string }) => {
-    const converted = await encodeCache.generate(block.body);
-    const tag = makeHtml(converted, encodeCache.mime(), encodeCache.cssClass());
+    const converted = await plantUMLServer.generate(block.body);
+    const tag = makeHtml(
+      converted,
+      plantUMLServer.mime(),
+      plantUMLServer.cssClass(),
+    );
     return tag;
   },
 };

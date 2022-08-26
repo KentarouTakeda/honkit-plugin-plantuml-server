@@ -17,7 +17,7 @@ export interface config {
   readonly cssClass: string | null;
 }
 
-export interface EncodeCache extends EventEmitter {
+export interface PlantUMLServer extends EventEmitter {
   on: ((event: 'process:start', cb: (hash: string) => void) => this) &
     ((event: 'process:memory', cb: (hash: string) => void) => this) &
     ((event: 'process:cache', cb: (hash: string) => void) => this) &
@@ -25,7 +25,7 @@ export interface EncodeCache extends EventEmitter {
     ((event: 'cache:write', cb: (fileName: string) => void) => this) &
     ((event: 'cache:error', cb: (fileName: string) => void) => this);
 }
-export class EncodeCache extends EventEmitter {
+export class PlantUMLServer extends EventEmitter {
   readonly #cache: Map<string, { data: ArrayBuffer; stored: boolean }> =
     new Map();
   readonly #config: config;
