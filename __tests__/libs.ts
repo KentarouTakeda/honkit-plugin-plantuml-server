@@ -1,4 +1,4 @@
-import { readFile } from 'fs/promises';
+import fs from 'fs';
 import { makeHtml, replaceCodeBlock } from '../src/libs';
 
 describe('replaceCodeBlock', () => {
@@ -8,17 +8,20 @@ describe('replaceCodeBlock', () => {
   });
 
   it('If a code block that is not uml is entered, return it as it is', async () => {
-    const markdown = await readFile(__dirname + '/files/no-uml.md', 'utf-8');
+    const markdown = await fs.promises.readFile(
+      __dirname + '/files/no-uml.md',
+      'utf-8',
+    );
     const actual = replaceCodeBlock(markdown);
     expect(actual).toBe(markdown);
   });
 
   it('Convert to block when uml is input', async () => {
-    const markdown = await readFile(
+    const markdown = await fs.promises.readFile(
       __dirname + '/files/uml-original.md',
       'utf-8',
     );
-    const expected = await readFile(
+    const expected = await fs.promises.readFile(
       __dirname + '/files/uml-converted.md',
       'utf-8',
     );

@@ -41,6 +41,7 @@
     "plantuml-encoder": "^1.4.0"
   },
   "devDependencies": {
+    "@swc/core": "^1.2.244",
     "@swc/jest": "^0.2.22",
     "@tsconfig/node16-strictest": "^1.0.0",
     "@types/jest": "^28.1.7",

@@ -1,5 +1,5 @@
 export const replaceCodeBlock = (markdown: string): string =>
-  markdown.replaceAll(
+  markdown.replace(
     /```(?:uml|puml|plantuml)\s+([\s\S]*?)```/gim,
     (_, uml) => '{% uml %}' + '\n' + uml + '{% enduml %}',
   );
