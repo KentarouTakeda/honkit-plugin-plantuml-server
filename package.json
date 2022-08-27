@@ -1,6 +1,6 @@
 {
   "name": "honkit-plugin-plantuml-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "PlantUML plugin for HonKit. No Java or Graphviz required.",
   "engines": {
     "honkit": "*"
