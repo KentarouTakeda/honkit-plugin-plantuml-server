@@ -2,19 +2,25 @@ import { tmpdir } from 'os';
 import { PlantUMLServer, config, mimes } from './PlantUMLServer';
 import { makeHtml, replaceCodeBlock } from './libs';
 
-const defaultConfig: config = {
+const defaultConfig: pluginConfig = {
   server: 'http://www.plantuml.com/plantuml/',
   format: 'svg',
   cacheDir: tmpdir(),
   cssClass: 'plantuml',
+  optimizeImage: true,
 };
 
+interface pluginConfig extends config {
+  optimizeImage: boolean;
+}
+
 let plantUMLServer: PlantUMLServer;
+const { optimizeImage, ...config } = { ...defaultConfig };
 
 export const hooks = {
   init: function (this: any) {
-    const config = Object.assign(
-      defaultConfig,
+    Object.assign(
+      config,
       this.config.get('pluginsConfig.plantuml-server'),
       // ebook-convert cannot handle svg format data-uri, so it is forced to change to png
       this.output.name === 'ebook' ? { format: 'png' } : {},
