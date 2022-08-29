@@ -38,7 +38,9 @@
   "dependencies": {
     "mkdirp": "^1.0.4",
     "node-fetch": "^2.6.7",
-    "plantuml-encoder": "^1.4.0"
+    "plantuml-encoder": "^1.4.0",
+    "png-strip-chunks": "^0.3.3",
+    "svgo": "^2.8.0"
   },
   "devDependencies": {
     "@swc/core": "^1.2.244",
@@ -48,6 +50,7 @@
     "@types/mkdirp": "^1.0.2",
     "@types/node": "^16.11.56",
     "@types/node-fetch": "^2.6.2",
+    "@types/svgo": "^2.6.4",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
     "eslint": "^8.22.0",

@@ -66,6 +66,7 @@ HTML is authored for example as follows.
 |format|*svg*|Supports *png* and *svg*|
 |cacheDir|`os.tmpdir()`|Directory to cache rendered results. If `null` is specified, cache is not used.|
 |cssClass|plantuml|CSS class name given to the rendered figure.|
+|optimizeImage|true|Whether to remove metadata from rendered results|
 
 A `book.json` describing these would look like this, for example:
 
@@ -79,7 +80,8 @@ A `book.json` describing these would look like this, for example:
       "server": "http://your-server.local/plantuml/",
       "format": "png",
       "cacheDir": "/tmp",
-      "cssClass": "customClassName"
+      "cssClass": "customClassName",
+      "optimizeImage": false
     }
   }
 }
