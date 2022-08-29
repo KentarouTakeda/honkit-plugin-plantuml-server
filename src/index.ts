@@ -1,8 +1,9 @@
+import assert from 'assert';
 import { tmpdir } from 'os';
-import { PlantUMLServer, config, mimes } from './PlantUMLServer';
-import { makeHtml, replaceCodeBlock } from './libs';
+import { PlantUMLServer, config as ClassConfig, mimes } from './PlantUMLServer';
+import { makeHtml, optimizeImage, replaceCodeBlock } from './libs';
 
-const defaultConfig: pluginConfig = {
+const defaultConfig: PluginConfig = {
   server: 'http://www.plantuml.com/plantuml/',
   format: 'svg',
   cacheDir: tmpdir(),
@@ -10,27 +11,42 @@ const defaultConfig: pluginConfig = {
   optimizeImage: true,
 };
 
-interface pluginConfig extends config {
+interface PluginConfig extends ClassConfig, LibConfig {}
+interface LibConfig {
   optimizeImage: boolean;
 }
 
-let plantUMLServer: PlantUMLServer;
-const { optimizeImage, ...config } = { ...defaultConfig };
+let plantUMLServer: PlantUMLServer | null = null;
+let libConfig: LibConfig | null = null;
+let classConfig: ClassConfig | null = null;
 
 export const hooks = {
   init: function (this: any) {
-    Object.assign(
-      config,
-      this.config.get('pluginsConfig.plantuml-server'),
+    const mergedConfig = Object.assign(
+      {},
+      defaultConfig,
+      this.config.get('pluginsConfig.plantuml-server') as PluginConfig,
       // ebook-convert cannot handle svg format data-uri, so it is forced to change to png
       this.output.name === 'ebook' ? { format: 'png' } : {},
     );
 
-    if (true !== Object.keys(mimes).includes(config.format)) {
-      throw new Error(`plantuml-server: invalid format "${config.format}"`);
+    libConfig = {
+      optimizeImage: mergedConfig.optimizeImage,
+    };
+    classConfig = {
+      cacheDir: mergedConfig.cacheDir,
+      cssClass: mergedConfig.cssClass,
+      format: mergedConfig.format,
+      server: mergedConfig.server,
+    };
+
+    if (true !== Object.keys(mimes).includes(classConfig.format)) {
+      throw new Error(
+        `plantuml-server: invalid format "${classConfig.format}"`,
+      );
     }
 
-    plantUMLServer = new PlantUMLServer(config);
+    plantUMLServer = new PlantUMLServer(classConfig);
     plantUMLServer.on('process:start', (hash) =>
       this.log.info(`plantuml-server: converting: ${hash}\n`),
     );
@@ -56,14 +72,26 @@ export const hooks = {
     return page;
   },
 
-  'finish:before': () => plantUMLServer.writeCache(),
+  'finish:before': () => {
+    assert(plantUMLServer);
+    plantUMLServer.writeCache();
+  },
 };
 
 export const blocks = {
   uml: async (block: { body: string }) => {
+    assert(libConfig);
+    assert(classConfig);
+    assert(plantUMLServer);
     const converted = await plantUMLServer.generate(block.body);
+
+    let optimized = converted;
+    if (libConfig.optimizeImage) {
+      optimized = await optimizeImage(converted, classConfig.format);
+    }
+
     const tag = makeHtml(
-      converted,
+      optimized,
       plantUMLServer.mime(),
       plantUMLServer.cssClass(),
     );
