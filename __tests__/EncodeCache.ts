@@ -131,7 +131,7 @@ describe('PlantUMLServer', () => {
   });
 
   describe('readFile', () => {
-    it('TODO', async () => {
+    it('Read file from arbitrary path', async () => {
       readFile!.mockReturnValue(Promise.resolve(Buffer.from('foo')));
       const plantUMLServer = new PlantUMLServer({
         server: 'http://test.invalid',
