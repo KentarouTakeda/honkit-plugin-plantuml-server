@@ -1,5 +1,9 @@
 import fs from 'fs';
-import { makeHtml, replaceCodeBlock } from '../src/libs';
+import {
+  convertUmlSrcToAbsolute,
+  makeHtml,
+  replaceCodeBlock,
+} from '../src/libs';
 
 describe('replaceCodeBlock', () => {
   it('If plain text is input, return it as is', async () => {
@@ -35,6 +39,84 @@ describe('makeHtml', () => {
     const expected =
       '<figure class="foo"><img src="data:image/svg+xml;base64,U1ZHIERBVEE="></figure>';
     const actual = makeHtml(Buffer.from('SVG DATA'), 'image/svg+xml', 'foo');
+
+    expect(actual).toBe(expected);
+  });
+});
+
+describe('convertUmlSrcToAbsolute', () => {
+  it('Relative path will be converted to absolute path', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `{% uml src="path/to/uml" %}`,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `{% uml src="/srcBase/srcPath/path/to/uml" %}`;
+
+    expect(actual).toBe(expected);
+  });
+
+  it('Multiple tags will all be converted', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `{% uml src="hoge" %}{% enduml %}{% uml src="fuga" %}{% enduml %}`,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `{% uml src="/srcBase/srcPath/hoge" %}{% enduml %}{% uml src="/srcBase/srcPath/fuga" %}{% enduml %}`;
+
+    expect(actual).toBe(expected);
+  });
+
+  it('tags containing newlines will be converted', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `
+      {%
+        uml
+        src="path/to/uml"
+      %}
+    `,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `
+      {%
+        uml
+        src="/srcBase/srcPath/path/to/uml"
+      %}
+    `;
+
+    expect(actual).toBe(expected);
+  });
+
+  it('Incomplete tags will not be converted', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `{% uml src="path/to/uml" `,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `{% uml src="path/to/uml" `;
+
+    expect(actual).toBe(expected);
+  });
+
+  it('Absolute paths will not be converted', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `{% uml src="/path/to/uml" %}`,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `{% uml src="/srcBase/path/to/uml" %}`;
+
+    expect(actual).toBe(expected);
+  });
+
+  it('Tags other than `uml` will not be converted', () => {
+    const actual = convertUmlSrcToAbsolute(
+      `{% hoge src="path/to/uml" %}`,
+      '/srcBase',
+      'srcPath/file',
+    );
+    const expected = `{% hoge src="path/to/uml" %}`;
 
     expect(actual).toBe(expected);
   });

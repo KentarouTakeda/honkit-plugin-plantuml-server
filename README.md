@@ -32,6 +32,8 @@ In this case your diagram is rendered on a public server. If you care about priv
 
 ## How To Use
 
+### Inline
+
 Write a code block quote specified to the `plantuml` language in markdown.
 
 For example, if you write the following in README.md.
@@ -57,6 +59,24 @@ HTML is authored for example as follows.
 </figure>
 ```
 *NOTE: You can change the CSS class name as you like.*
+
+### External file
+
+If you specify a relative path, it will read the path relative to the original markdown. For example:
+
+```
+{% uml src="path/to/uml" %}
+{% enduml %}
+```
+
+If you specify an absolute path, it will be read based on the root folder of the books defined by `book.json`.  For example:
+
+```
+{% uml src="/path/to/uml" %}
+{% enduml %}
+```
+
+*NOTE: Modifications other than markdown files are not supported by `honkit serve` hot reload.*
 
 ## Configuration
 

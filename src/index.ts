@@ -1,7 +1,13 @@
 import assert from 'assert';
+import { readFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { PlantUMLServer, config as ClassConfig, mimes } from './PlantUMLServer';
-import { makeHtml, optimizeImage, replaceCodeBlock } from './libs';
+import {
+  convertUmlSrcToAbsolute,
+  makeHtml,
+  optimizeImage,
+  replaceCodeBlock,
+} from './libs';
 
 const defaultConfig: PluginConfig = {
   server: 'http://www.plantuml.com/plantuml/',
@@ -67,7 +73,12 @@ export const hooks = {
     );
   },
 
-  'page:before': (page: { content: string }) => {
+  'page:before': function (this: any, page: { content: string; path: string }) {
+    page.content = convertUmlSrcToAbsolute(
+      page.content,
+      this.resolve('./'),
+      page.path,
+    );
     page.content = replaceCodeBlock(page.content);
     return page;
   },
@@ -79,11 +90,25 @@ export const hooks = {
 };
 
 export const blocks = {
-  uml: async (block: { body: string }) => {
+  uml: async function (
+    this: any,
+    block: { body: string; kwargs: Record<string, string> },
+  ) {
     assert(libConfig);
     assert(classConfig);
     assert(plantUMLServer);
-    const converted = await plantUMLServer.generate(block.body);
+
+    let body: string;
+    if (!!block.kwargs['src']) {
+      body =
+        (await readFile(block.kwargs['src'], 'utf-8').catch((e) => {
+          this.log.warn((e?.message ?? e) + '\n');
+        })) ?? '';
+    } else {
+      body = block.body;
+    }
+
+    const converted = await plantUMLServer.generate(body);
 
     let optimized = converted;
     if (libConfig.optimizeImage) {

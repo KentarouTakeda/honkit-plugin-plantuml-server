@@ -1,3 +1,4 @@
+import { dirname } from 'path';
 import { strip } from 'png-strip-chunks';
 import { optimize, OptimizedSvg } from 'svgo';
 import type { config as ClassConfig } from './PlantUMLServer';
@@ -6,6 +7,26 @@ export const replaceCodeBlock = (markdown: string): string =>
   markdown.replace(
     /```(?:uml|puml|plantuml)\s+([\s\S]*?)```/gim,
     (_, uml) => '{% uml %}' + '\n' + uml + '{% enduml %}',
+  );
+
+export const convertUmlSrcToAbsolute = (
+  markdown: string,
+  srcBasePath: string,
+  srcPath: string,
+): string =>
+  markdown.replace(
+    /(?<={%\s+?uml\s+?)src="(.*?)"(?=\s+?%})/gim,
+    (_, src: string) => {
+      const pathes = [srcBasePath];
+      if (src[0] !== '/') {
+        pathes.push(dirname(srcPath));
+      } else {
+        src = src.slice(1);
+      }
+      pathes.push(src);
+
+      return `src="${pathes.join('/')}"`;
+    },
   );
 
 export const makeHtml = (
