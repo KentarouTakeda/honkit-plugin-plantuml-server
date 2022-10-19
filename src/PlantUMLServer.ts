@@ -22,6 +22,10 @@ export interface PlantUMLServer extends EventEmitter {
     ((event: 'process:memory', cb: (hash: string) => void) => this) &
     ((event: 'process:cache', cb: (hash: string) => void) => this) &
     ((event: 'process:server', cb: (hash: string) => void) => this) &
+    ((
+      event: 'process:server:error',
+      cb: (url: string, e: any) => void,
+    ) => this) &
     ((event: 'cache:write', cb: (fileName: string) => void) => this) &
     ((event: 'cache:error', cb: (fileName: string) => void) => this);
 }
@@ -40,7 +44,7 @@ export class PlantUMLServer extends EventEmitter {
     };
   }
 
-  async generate(uml: string): Promise<ArrayBuffer> {
+  async generate(uml: string): Promise<ArrayBuffer | null> {
     const encoded = encode(uml);
     const hash = createHash('sha1').update(uml).digest('hex');
     const url = this.#url(encoded);
@@ -60,14 +64,23 @@ export class PlantUMLServer extends EventEmitter {
       return stored;
     }
 
-    const requested = await this.request(url);
-    this.#cache.set(hash, { data: requested, stored: false });
-    this.emit('process:server', hash);
+    const requested =
+      (await this.request(url).catch((e) => {
+        this.emit('process:server:error', url, e);
+      })) ?? null;
+    if (requested) {
+      this.#cache.set(hash, { data: requested, stored: false });
+      this.emit('process:server', hash);
+    }
     return requested;
   }
 
-  async request(url: string): Promise<ArrayBuffer> {
+  async request(url: string): Promise<ArrayBuffer | null> {
     const response = await fetch(url);
+    if (response.status >= 500) {
+      this.emit('process:server:error', url, response.statusText);
+      return null;
+    }
     const text = await response.buffer();
     return text;
   }

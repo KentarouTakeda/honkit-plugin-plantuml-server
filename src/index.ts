@@ -65,6 +65,11 @@ export const hooks = {
     plantUMLServer.on('process:server', (hash) =>
       this.log.info(`plantuml-server: converted from server: ${hash}\n`),
     );
+    plantUMLServer.on('process:server:error', (url, e) => {
+      this.log.warn(`plantuml-server: server error: ${url}\n`);
+      this.log.warn(e);
+      this.log.warn('\n');
+    });
     plantUMLServer.on('cache:write', (fileName) =>
       this.log.info(`plantuml-server: write cache: ${fileName}\n`),
     );
@@ -111,12 +116,12 @@ export const blocks = {
     const converted = await plantUMLServer.generate(body);
 
     let optimized = converted;
-    if (libConfig.optimizeImage) {
+    if (libConfig.optimizeImage && converted) {
       optimized = await optimizeImage(converted, classConfig.format);
     }
 
     const tag = makeHtml(
-      optimized,
+      optimized ?? new ArrayBuffer(0),
       plantUMLServer.mime(),
       plantUMLServer.cssClass(),
     );
