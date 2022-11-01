@@ -1,6 +1,6 @@
 import { dirname } from 'path';
 import { strip } from 'png-strip-chunks';
-import { optimize, OptimizedSvg } from 'svgo';
+import { optimize } from 'svgo';
 import type { config as ClassConfig } from './PlantUMLServer';
 
 export const replaceCodeBlock = (markdown: string): string =>
@@ -59,17 +59,8 @@ export const optimizeImage = async (
   throw new Error(`plantuml-server: invalid format "${format}"`);
 };
 
-const isOptimizedSvg = (optimized: any): optimized is OptimizedSvg => {
-  return (
-    optimized && optimized.error == null && typeof optimized.data === 'string'
-  );
-};
-
 export const optimizeSvg = async (src: Buffer): Promise<Buffer> => {
   const optimized = optimize(src.toString());
-  if (!isOptimizedSvg(optimized)) {
-    throw optimized;
-  }
   return Buffer.from(optimized.data);
 };
 
