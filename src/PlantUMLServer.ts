@@ -76,7 +76,9 @@ export class PlantUMLServer extends EventEmitter {
   }
 
   async request(url: string): Promise<ArrayBuffer | null> {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      timeout: 60000,
+    });
     if (!response.ok) {
       this.emit('process:server:error', url, response.statusText);
       return null;
