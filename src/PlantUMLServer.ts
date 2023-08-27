@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import EventEmitter from 'events';
 import fs from 'fs';
-import mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import fetch from 'node-fetch';
 import { encode } from 'plantuml-encoder';
 
