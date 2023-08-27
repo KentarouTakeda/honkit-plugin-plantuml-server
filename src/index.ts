@@ -57,7 +57,7 @@ export const hooks = {
       this.log.info(`plantuml-server: converting: ${hash}\n`),
     );
     plantUMLServer.on('process:memory', (hash) =>
-      this.log.info(`plantuml-server: converted from memoty: ${hash}\n`),
+      this.log.info(`plantuml-server: converted from memory: ${hash}\n`),
     );
     plantUMLServer.on('process:cache', (hash) =>
       this.log.info(`plantuml-server: converted from cache: ${hash}\n`),
