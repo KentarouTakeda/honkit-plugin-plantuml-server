@@ -4,6 +4,7 @@ import fs from 'fs';
 import { mkdirp } from 'mkdirp';
 import fetch from 'node-fetch';
 import { encode } from 'plantuml-encoder';
+import promiseRetry from 'promise-retry';
 
 export const mimes = {
   png: 'image/png',
@@ -76,9 +77,15 @@ export class PlantUMLServer extends EventEmitter {
   }
 
   async request(url: string): Promise<ArrayBuffer | null> {
-    const response = await fetch(url, {
-      timeout: 60000,
-    });
+    const response = await promiseRetry(
+      (retry) => fetch(url, { timeout: 10000 }).catch(retry),
+      {
+        maxRetryTime: 120000,
+        forever: true,
+        minTimeout: 1000,
+        randomize: true,
+      },
+    );
     if (!response.ok) {
       this.emit('process:server:error', url, response.statusText);
       return null;
