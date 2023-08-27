@@ -66,9 +66,10 @@ export const hooks = {
       this.log.info(`plantuml-server: converted from server: ${hash}\n`),
     );
     plantUMLServer.on('process:server:error', (url, e) => {
-      this.log.warn(`plantuml-server: server error: ${url}\n`);
-      this.log.warn(e);
-      this.log.warn('\n');
+      this.log.error(`plantuml-server: server error: ${url}\n`);
+      this.log.error(e);
+      this.log.error('\n');
+      throw e;
     });
     plantUMLServer.on('cache:write', (fileName) =>
       this.log.info(`plantuml-server: write cache: ${fileName}\n`),
