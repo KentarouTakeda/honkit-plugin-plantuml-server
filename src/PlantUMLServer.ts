@@ -72,6 +72,9 @@ export class PlantUMLServer extends EventEmitter {
     if (requested) {
       this.#cache.set(hash, { data: requested, stored: false });
       this.emit('process:server', hash);
+
+      const fileName = this.#cachePath(hash);
+      await this.writeFile(fileName, requested);
     }
     return requested;
   }
@@ -92,26 +95,6 @@ export class PlantUMLServer extends EventEmitter {
     }
     const text = await response.buffer();
     return text;
-  }
-
-  async writeCache(): Promise<void> {
-    if (null == this.#config.cacheDir) {
-      return;
-    }
-
-    const promises: Promise<unknown>[] = [];
-    await this.makeCacheDirectory();
-
-    for (const [hash, cache] of this.#cache) {
-      if (cache.stored) {
-        continue;
-      }
-      const fileName = this.#cachePath(hash);
-      const promise = this.writeFile(fileName, cache.data);
-      promises.push(promise);
-    }
-
-    return Promise.all(promises).then();
   }
 
   async writeFile(fileName: string | null, data: ArrayBuffer) {
