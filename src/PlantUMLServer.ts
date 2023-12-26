@@ -31,8 +31,7 @@ export interface PlantUMLServer extends EventEmitter {
     ((event: 'cache:error', cb: (fileName: string) => void) => this);
 }
 export class PlantUMLServer extends EventEmitter {
-  readonly #cache: Map<string, { data: ArrayBuffer; stored: boolean }> =
-    new Map();
+  readonly #cache: Map<string, ArrayBuffer> = new Map();
   readonly #config: config;
 
   constructor(config: config) {
@@ -55,12 +54,12 @@ export class PlantUMLServer extends EventEmitter {
     const cached = this.#cache.get(hash);
     if (cached) {
       this.emit('process:memory', hash);
-      return cached.data;
+      return cached;
     }
 
     const stored = await this.readFile(this.#cachePath(hash));
     if (stored) {
-      this.#cache.set(hash, { data: stored, stored: true });
+      this.#cache.set(hash, stored);
       this.emit('process:cache', hash);
       return stored;
     }
@@ -70,15 +69,26 @@ export class PlantUMLServer extends EventEmitter {
         this.emit('process:server:error', url, e);
       })) ?? null;
     if (requested) {
-      this.#cache.set(hash, { data: requested, stored: false });
+      this.#cache.set(hash, requested);
       this.emit('process:server', hash);
+
+      const fileName = this.#cachePath(hash);
+      await this.writeFile(fileName, requested);
     }
     return requested;
   }
 
   async request(url: string): Promise<ArrayBuffer | null> {
     const response = await promiseRetry(
-      (retry) => fetch(url, { timeout: 10000 }).catch(retry),
+      (retry) =>
+        fetch(url, { timeout: 10000 })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response;
+          })
+          .catch(retry),
       {
         maxRetryTime: 120000,
         forever: true,
@@ -92,26 +102,6 @@ export class PlantUMLServer extends EventEmitter {
     }
     const text = await response.buffer();
     return text;
-  }
-
-  async writeCache(): Promise<void> {
-    if (null == this.#config.cacheDir) {
-      return;
-    }
-
-    const promises: Promise<unknown>[] = [];
-    await this.makeCacheDirectory();
-
-    for (const [hash, cache] of this.#cache) {
-      if (cache.stored) {
-        continue;
-      }
-      const fileName = this.#cachePath(hash);
-      const promise = this.writeFile(fileName, cache.data);
-      promises.push(promise);
-    }
-
-    return Promise.all(promises).then();
   }
 
   async writeFile(fileName: string | null, data: ArrayBuffer) {

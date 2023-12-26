@@ -88,11 +88,6 @@ export const hooks = {
     page.content = replaceCodeBlock(page.content);
     return page;
   },
-
-  'finish:before': () => {
-    assert(plantUMLServer);
-    plantUMLServer.writeCache();
-  },
 };
 
 export const blocks = {
