@@ -80,7 +80,15 @@ export class PlantUMLServer extends EventEmitter {
 
   async request(url: string): Promise<ArrayBuffer | null> {
     const response = await promiseRetry(
-      (retry) => fetch(url, { timeout: 10000 }).catch(retry),
+      (retry) =>
+        fetch(url, { timeout: 10000 })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response;
+          })
+          .catch(retry),
       {
         maxRetryTime: 120000,
         forever: true,
