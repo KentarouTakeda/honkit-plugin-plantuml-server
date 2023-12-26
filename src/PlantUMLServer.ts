@@ -31,8 +31,7 @@ export interface PlantUMLServer extends EventEmitter {
     ((event: 'cache:error', cb: (fileName: string) => void) => this);
 }
 export class PlantUMLServer extends EventEmitter {
-  readonly #cache: Map<string, { data: ArrayBuffer; stored: boolean }> =
-    new Map();
+  readonly #cache: Map<string, ArrayBuffer> = new Map();
   readonly #config: config;
 
   constructor(config: config) {
@@ -55,12 +54,12 @@ export class PlantUMLServer extends EventEmitter {
     const cached = this.#cache.get(hash);
     if (cached) {
       this.emit('process:memory', hash);
-      return cached.data;
+      return cached;
     }
 
     const stored = await this.readFile(this.#cachePath(hash));
     if (stored) {
-      this.#cache.set(hash, { data: stored, stored: true });
+      this.#cache.set(hash, stored);
       this.emit('process:cache', hash);
       return stored;
     }
@@ -70,7 +69,7 @@ export class PlantUMLServer extends EventEmitter {
         this.emit('process:server:error', url, e);
       })) ?? null;
     if (requested) {
-      this.#cache.set(hash, { data: requested, stored: false });
+      this.#cache.set(hash, requested);
       this.emit('process:server', hash);
 
       const fileName = this.#cachePath(hash);
