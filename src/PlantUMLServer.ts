@@ -2,7 +2,6 @@ import { createHash } from 'crypto';
 import EventEmitter from 'events';
 import fs from 'fs';
 import { mkdirp } from 'mkdirp';
-import fetch from 'node-fetch';
 import { encode } from 'plantuml-encoder';
 import promiseRetry from 'promise-retry';
 
@@ -81,7 +80,7 @@ export class PlantUMLServer extends EventEmitter {
   async request(url: string): Promise<ArrayBuffer | null> {
     const response = await promiseRetry(
       (retry) =>
-        fetch(url, { timeout: 10000 })
+        fetch(url, { signal: AbortSignal.timeout(15000) })
           .then((response) => {
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
@@ -100,7 +99,7 @@ export class PlantUMLServer extends EventEmitter {
       this.emit('process:server:error', url, response.statusText);
       return null;
     }
-    const text = await response.buffer();
+    const text = await response.arrayBuffer();
     return text;
   }
 
