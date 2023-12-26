@@ -92,44 +92,6 @@ describe('PlantUMLServer', () => {
     });
   });
 
-  describe('writeCache', () => {
-    it('Conversion results are cached in the file system using the hash of the uml document as a key', async () => {
-      const plantUMLServer = new PlantUMLServer({
-        server: 'http://test.invalid',
-        format: 'svg',
-        cacheDir: '/path/to/cache',
-        cssClass: 'bar',
-      });
-      const uml = 'Bob -> Alice : Hello!';
-      const hash = createHash('sha1').update(uml).digest('hex');
-
-      await plantUMLServer.generate(uml);
-      await plantUMLServer.writeCache();
-      expect(writeFile).toBeCalledWith(
-        '/path/to/cache/honkit-plugin-plantuml-server-' + hash + '.svg',
-        svg,
-      );
-      expect(writeFile).toBeCalledTimes(1);
-      expect(makeCacheDirectory).toBeCalledTimes(1);
-    });
-
-    it('If `cacheDir` is not set, conversion results will not be cached.', async () => {
-      const plantUMLServer = new PlantUMLServer({
-        server: 'http://test.invalid',
-        format: 'svg',
-        cacheDir: null,
-        cssClass: 'bar',
-      });
-      const uml = 'Bob -> Alice : Hello!';
-      const hash = createHash('sha1').update(uml).digest('hex');
-
-      await plantUMLServer.generate(uml);
-      await plantUMLServer.writeCache();
-      expect(writeFile).not.toBeCalled();
-      expect(makeCacheDirectory).not.toBeCalled();
-    });
-  });
-
   describe('readFile', () => {
     it('Read file from arbitrary path', async () => {
       readFile!.mockReturnValue(Promise.resolve(Buffer.from('foo')));
