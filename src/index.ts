@@ -32,7 +32,7 @@ const mergeConfig = (
 ): PluginConfig => ({
   ...defaultConfig,
   ...Object.fromEntries(
-    Object.entries(config).filter((_, value) => null != value),
+    Object.entries(config).filter(([_, value]) => null != value),
   ),
 });
 
