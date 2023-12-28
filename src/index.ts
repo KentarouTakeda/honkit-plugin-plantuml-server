@@ -26,15 +26,23 @@ let plantUMLServer: PlantUMLServer | null = null;
 let libConfig: LibConfig | null = null;
 let classConfig: ClassConfig | null = null;
 
+const mergeConfig = (
+  defaultConfig: PluginConfig,
+  config: Partial<PluginConfig>,
+): PluginConfig => ({
+  ...defaultConfig,
+  ...Object.fromEntries(
+    Object.entries(config).filter((_, value) => null != value),
+  ),
+});
+
 export const hooks = {
   init: function (this: any) {
-    const mergedConfig = Object.assign(
-      {},
-      defaultConfig,
-      this.config.get('pluginsConfig.plantuml-server') as PluginConfig,
+    const mergedConfig = mergeConfig(defaultConfig, {
+      ...this.config.get('pluginsConfig.plantuml-server'),
       // ebook-convert cannot handle svg format data-uri, so it is forced to change to png
-      this.output.name === 'ebook' ? { format: 'png' } : {},
-    );
+      ...(this.output.name === 'ebook' ? { format: 'png' } : {}),
+    });
 
     libConfig = {
       optimizeImage: mergedConfig.optimizeImage,
